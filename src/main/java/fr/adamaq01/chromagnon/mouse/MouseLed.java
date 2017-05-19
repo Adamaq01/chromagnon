@@ -3,7 +3,7 @@ package fr.adamaq01.chromagnon.mouse;
 /**
  * Created by Adamaq01 on 19/05/17.
  */
-public enum MouseRzLed2 {
+public enum MouseLed {
 
     RZLED2_SCROLLWHEEL(0x0203),
     RZLED2_LOGO(0x0703),
@@ -30,11 +30,19 @@ public enum MouseRzLed2 {
 
     private int id;
 
-    private MouseRzLed2(int id) {
+    private MouseLed(int id) {
         this.id = id;
     }
 
     public int getId() {
         return id;
+    }
+
+    public byte getRow() {
+        return (byte) ((this.id >> 8) & 0xFF);
+    }
+
+    public byte getColumn() {
+        return (byte) (this.id & 0xFF);
     }
 }

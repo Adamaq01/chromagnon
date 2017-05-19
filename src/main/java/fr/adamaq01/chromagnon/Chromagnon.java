@@ -4,7 +4,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import fr.adamaq01.chromagnon.mouse.effect.MouseEffect;
+import fr.adamaq01.chromagnon.mouse.MouseLed;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -13,8 +13,32 @@ import org.json.JSONObject;
  */
 public class Chromagnon {
 
-    public static void main(String[] args) {
-        Chromagnon.getInstance();
+    public static void main(String[] args) throws InterruptedException {
+        long start = System.currentTimeMillis();
+        while(!(System.currentTimeMillis() - start > 5000)) {
+            Chromagnon.getInstance().setMouseColor(MouseLed.RZLED2_LEFT_SIDE6, new ColorRef(0, 0, 0));
+            Chromagnon.getInstance().setMouseColor(MouseLed.RZLED2_LEFT_SIDE1, new ColorRef(196, 19, 178));
+            Thread.sleep(50);
+            Chromagnon.getInstance().setMouseColor(MouseLed.RZLED2_LEFT_SIDE7, new ColorRef(0, 0, 0));
+            Thread.sleep(200);
+            Chromagnon.getInstance().setMouseColor(MouseLed.RZLED2_LEFT_SIDE2, new ColorRef(196, 19, 178));
+            Thread.sleep(50);
+            Chromagnon.getInstance().setMouseColor(MouseLed.RZLED2_LEFT_SIDE1, new ColorRef(0, 0, 0));
+            Chromagnon.getInstance().setMouseColor(MouseLed.RZLED2_LEFT_SIDE3, new ColorRef(196, 19, 178));
+            Thread.sleep(50);
+            Chromagnon.getInstance().setMouseColor(MouseLed.RZLED2_LEFT_SIDE2, new ColorRef(0, 0, 0));
+            Chromagnon.getInstance().setMouseColor(MouseLed.RZLED2_LEFT_SIDE4, new ColorRef(196, 19, 178));
+            Thread.sleep(50);
+            Chromagnon.getInstance().setMouseColor(MouseLed.RZLED2_LEFT_SIDE3, new ColorRef(0, 0, 0));
+            Chromagnon.getInstance().setMouseColor(MouseLed.RZLED2_LEFT_SIDE5, new ColorRef(196, 19, 178));
+            Thread.sleep(50);
+            Chromagnon.getInstance().setMouseColor(MouseLed.RZLED2_LEFT_SIDE4, new ColorRef(0, 0, 0));
+            Chromagnon.getInstance().setMouseColor(MouseLed.RZLED2_LEFT_SIDE6, new ColorRef(196, 19, 178));
+            Thread.sleep(50);
+            Chromagnon.getInstance().setMouseColor(MouseLed.RZLED2_LEFT_SIDE5, new ColorRef(0, 0, 0));
+            Chromagnon.getInstance().setMouseColor(MouseLed.RZLED2_LEFT_SIDE7, new ColorRef(196, 19, 178));
+        }
+        Chromagnon.getInstance().free();
     }
 
     private static Chromagnon instance;
@@ -27,8 +51,20 @@ public class Chromagnon {
     }
 
     private int sessionId;
+    private int[][] mouseColor;
 
     private Chromagnon() throws ChromagnonException {
+        mouseColor = new int[][]{
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0}
+        };
         try {
             JSONObject initializationData = new JSONObject();
             initializationData.put("title", "Chromagnon");
@@ -57,6 +93,8 @@ public class Chromagnon {
     public void heartbeat() throws ChromagnonException {
         try {
             HttpResponse<JsonNode> response = Unirest.put("http://localhost:" + this.sessionId + "/chromasdk/heartbeat").asJson();
+            int result = (int) response.getBody().getObject().get("result");
+            System.out.println(ChromagnonException.errorCodeToString(result));
         } catch (UnirestException e) {
             e.printStackTrace();
         }
@@ -64,17 +102,24 @@ public class Chromagnon {
 
     public void free() throws ChromagnonException {
         try {
-            HttpResponse<JsonNode> response = Unirest.delete("http://localhost:" + this.sessionId + "/chromasdk/heartbeat").asJson();
+            HttpResponse<JsonNode> response = Unirest.delete("http://localhost:" + this.sessionId + "/chromasdk").asJson();
             int result = (int) response.getBody().getObject().get("result");
+            System.out.println(ChromagnonException.errorCodeToString(result));
         } catch (UnirestException e) {
             e.printStackTrace();
         }
     }
 
-    public void createMouseEffect(MouseEffect effect) {
+    public void setMouseColor(MouseLed led, ColorRef color) {
         try {
-            HttpResponse<JsonNode> response = Unirest.put("http://localhost:" + this.sessionId + "/chromasdk/mouse").header("Content-Type", "application/json").body(effect.toJson().toString()).asJson();
+            JSONObject object = new JSONObject();
+            object.put("effect", "CHROMA_CUSTOM2");
+            mouseColor[led.getRow()][led.getColumn()] = color.value();
+            JSONArray params = new JSONArray(mouseColor);
+            object.put("param", params);
+            HttpResponse<JsonNode> response = Unirest.put("http://localhost:" + this.sessionId + "/chromasdk/mouse").header("Content-Type", "application/json").body(object).asJson();
             int result = (int) response.getBody().getObject().get("result");
+            System.out.println(ChromagnonException.errorCodeToString(result));
         } catch (UnirestException e) {
             e.printStackTrace();
         }
