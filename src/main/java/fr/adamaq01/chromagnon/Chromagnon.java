@@ -9,7 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
- * Created by Adamaq01 on 19/05/2017.
+ * Created by Compagny912 on 19/05/2017.
  */
 public class Chromagnon {
 
