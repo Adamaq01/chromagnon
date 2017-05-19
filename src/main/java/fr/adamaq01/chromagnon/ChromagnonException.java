@@ -21,12 +21,38 @@ public class ChromagnonException extends RuntimeException {
      */
     public static String errorCodeToString(int error) {
         switch (error) {
+            case -1:
+                return "Invalid";
             case 0:
-                return "No error";
-            case 87:
-                return "Invalid parameter";
+                return "Success";
+            case 5:
+                return "Access denied";
+            case 6:
+                return "Invalid handle";
             case 50:
                 return "Not supported";
+            case 87:
+                return "Invalid parameter";
+            case 1062:
+                return "The service has not been started";
+            case 1152:
+                return "Cannot start more than one instance of the specified program";
+            case 1167:
+                return "Device not connected";
+            case 1168:
+                return "Element not found";
+            case 1235:
+                return "Request aborted";
+            case 1247:
+                return "An attempt was made to perform an initialization operation when initialization has already been completed";
+            case 4309:
+                return "Resource not available or disabled";
+            case 4319:
+                return "Device not available or supported";
+            case 5023:
+                return "The group or resource is not in the correct state to perform the requested operation";
+            case 259:
+                return "No more items";
         }
         return "Unknown(" + error + ")";
     }
